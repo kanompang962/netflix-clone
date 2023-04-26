@@ -1,10 +1,53 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Input from "@/components/input";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
 
 
 const Auth = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [variant, setVariant] = useState('Sign In');
+
+    const router = useRouter();
+
+    // สลับหน้า SignUp และ SignIn
+    const toggleVariant = useCallback(() => {
+        setVariant((currentVariant) => currentVariant === 'Sign In' ? 'Sign Up' : 'Sign In');
+    }, []);
+
+    // API SignIn
+    const login = useCallback(async () => {
+        try {
+            await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: '/'
+            });
+            router.push('/');
+        } catch (error) {
+            console.log(error);
+        }
+    }, [email, password, router]);
+
+    // API SigUp
+    const signUp = useCallback(async () => {
+        try {
+            await axios.post('/api/signUp', {
+                email,
+                name,
+                password
+            });
+            login();
+        } catch (error) {
+            console.log(error);
+        }
+    }, [email, name, password, login]);
+
+
 
     return (
         <div className="relative h-full w-full bg-[url('/images/hero.jpg')] bg-no-repeat bg-center bg-fixed bg-cover">
@@ -15,9 +58,17 @@ const Auth = () => {
                 <div className="flex justify-center">
                     <div className="bg-black bg-opacity-70 px-16 py-16 self-center mt-2 lg:w-2/5 lg:max-w-md w-full">
                         <h2 className="text-white text-4xl mb-8 font-semibold">
-                            Sing in
+                            {variant === 'Sign In' ? 'Sign In' : 'Sign Up'}
                         </h2>
                         <div className="flex flex-col gap-4">
+                            {variant === 'Sign Up' && (
+                                <Input
+                                    id="name"
+                                    label="Username"
+                                    value={name}
+                                    onChange={(ev: any) => setName(ev.target.value)}
+                                />
+                            )}
                             <Input
                                 id="email"
                                 type="email"
@@ -33,13 +84,13 @@ const Auth = () => {
                                 onChange={(ev: any) => setPassword(ev.target.value)}
                             />
                         </div>
-                        <button className="bg-red-600 py-3 text-white rounded-md w-full mt-10 hover:bg-red-700 transition">
-                            Login
+                        <button onClick={variant === 'Sign In' ? login : signUp} className="bg-red-600 py-3 text-white rounded-md w-full mt-10 hover:bg-red-700 transition">
+                            {variant === 'Sign In' ? 'Sign In' : 'Sign Up'}
                         </button>
                         <p className="text-neutral-500 mt-12">
-                            First time using Netflix?
-                            <span className="text-white ml-1 hover:underline cursor-pointer">
-                                Create and account
+                            {variant === 'Sign In' ? 'New to Netflix?' : 'Already registered? Please'}
+                            <span onClick={toggleVariant} className="text-white ml-1 hover:underline cursor-pointer">
+                                {variant === 'Sign In' ? 'Sign up now.' : 'Sign In'}
                             </span>
                         </p>
                     </div>
