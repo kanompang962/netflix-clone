@@ -2,10 +2,11 @@ import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useCallback, useState } from "react";
 // componens
-import Input from "@/components/input";
+import Input from "@/components/Input";
 // icons
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
+
 
 
 const Auth = () => {
