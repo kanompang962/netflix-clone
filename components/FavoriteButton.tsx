@@ -54,6 +54,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({ movieId }) => {
             justify-center
             items-center
             transition
+            text-white
             hover:border-neutral-300">
             <Icon />
         </div>
